@@ -1,0 +1,2 @@
+[2024-02-28 16:01:59,643] INFO [GroupMetadataManager brokerId=0] Group console-consumer-63777 transitioned to Dead in generation 2 (kafka.coordinator.group.GroupMetadataManager)
+[2024-02-28 16:03:51,634] INFO [BrokerToControllerChannelManager id=0 name=forwarding] Node 0 disconnected. (org.apache.kafka.clients.NetworkClient)

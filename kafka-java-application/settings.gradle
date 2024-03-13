@@ -1,0 +1,4 @@
+rootProject.name = 'kafka-java-application'
+include 'kafka-basics'
+include 'kafka-producer-wikimedia'
+

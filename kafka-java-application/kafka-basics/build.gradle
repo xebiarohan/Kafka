@@ -1,0 +1,28 @@
+plugins {
+    id 'groovy'
+}
+
+group 'org.kafka'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    implementation 'org.apache.kafka:kafka-clients:3.6.1'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+
+
+    implementation 'org.slf4j:slf4j-simple:2.0.12'
+
+    implementation 'org.apache.groovy:groovy:4.0.14'
+}
+
+test {
+    useJUnitPlatform()
+}
