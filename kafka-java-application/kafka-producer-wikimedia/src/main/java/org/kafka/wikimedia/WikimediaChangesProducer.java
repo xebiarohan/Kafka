@@ -2,9 +2,9 @@ package org.kafka.wikimedia;
 
 import com.launchdarkly.eventsource.EventSource;
 import com.launchdarkly.eventsource.ReadyState;
-import com.launchdarkly.eventsource.StreamEvent;
 import com.launchdarkly.eventsource.StreamException;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -28,6 +28,11 @@ public class WikimediaChangesProducer {
         // set producer properties
         properties.setProperty("key.serializer", StringSerializer.class.getName());
         properties.setProperty("value.serializer",StringSerializer.class.getName());
+
+        // High throughput producer configs
+        properties.setProperty(ProducerConfig.LINGER_MS_CONFIG,"20");
+        properties.setProperty(ProducerConfig.BATCH_SIZE_CONFIG,Integer.toString(32 * 1024)); // 32KB
+        properties.setProperty(ProducerConfig.COMPRESSION_TYPE_CONFIG,"snappy");
 
         // create a producer
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
