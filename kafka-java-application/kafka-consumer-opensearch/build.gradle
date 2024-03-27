@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group 'org.kafka'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    implementation 'org.apache.kafka:kafka-clients:3.6.1'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+
+
+    implementation 'org.slf4j:slf4j-simple:2.0.12'
+
+    implementation 'org.opensearch.client:opensearch-rest-high-level-client:2.12.0'
+
+    implementation 'org.kie.modules:com-google-code-gson:6.5.0.Final'
+}
+
+test {
+    useJUnitPlatform()
+}
