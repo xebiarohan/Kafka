@@ -10,8 +10,10 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.errors.WakeupException;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.lucene.index.IndexReader;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
 import org.opensearch.action.index.IndexRequest;
 import org.opensearch.action.index.IndexResponse;
 import org.opensearch.client.RequestOptions;
@@ -19,9 +21,6 @@ import org.opensearch.client.RestClient;
 import org.opensearch.client.RestHighLevelClient;
 import org.opensearch.client.indices.CreateIndexRequest;
 import org.opensearch.client.indices.GetIndexRequest;
-import org.opensearch.core.xcontent.MediaType;
-import org.opensearch.core.xcontent.XContent;
-import org.opensearch.core.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +77,24 @@ public class OpenSearchConsumer {
         //Creating our Kafka client
         KafkaConsumer<String,String> consumer = createKafkaConsumer();
 
+        // Get reference to the main thread
+        final Thread thread = Thread.currentThread();
+
+        // adding the shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run(){
+                logger.info("Detected a shutdown, let's exit using consumer.wakeup()...");
+                consumer.wakeup();
+
+                // join the main thread to allow the execution of the code in the main thread
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         try(openSearchClient; consumer) {
 
             boolean indexExists = openSearchClient.indices().exists(new GetIndexRequest("wikimedia"), RequestOptions.DEFAULT);
@@ -99,6 +116,8 @@ public class OpenSearchConsumer {
                 int count = records.count();
                 logger.info("Received :" + count + " records");
 
+                BulkRequest bulkRequest = new BulkRequest();
+
                 for(ConsumerRecord<String,String> record: records) {
                     try {
                         // id for Idempotent feature
@@ -107,21 +126,35 @@ public class OpenSearchConsumer {
                         IndexRequest indexRequest = new IndexRequest("wikimedia")
                                 .source(record.value(),INDEX_CONTENT_TYPE)
                                 .id(id);
-                        IndexResponse indexResponse = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
-                        logger.info(indexResponse.getId());
+
+                       // IndexResponse indexResponse = openSearchClient.index(indexRequest, RequestOptions.DEFAULT);
+                        //logger.info(indexResponse.getId());
+
+                        bulkRequest.add(indexRequest);
                     } catch (Exception ex) {
                         // DO nothing for the time being
                     }
+                }
 
+                if(bulkRequest.numberOfActions() > 0) {
+                    BulkResponse response = openSearchClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+                    logger.info("Inserted" + response.getItems().length + " records");
+
+                    Thread.sleep(1000);
                 }
             }
 
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (WakeupException ex) {
+            logger.info("Consumer is starting to shut down...");
+        } catch (Exception ex) {
+            logger.error("Unexpected error in the consumer", ex);
+        } finally {
+            consumer.close(); // closes the consumer and this will also commits the offsets
+            openSearchClient.close();
+            logger.info("Consumer is shut down");
         }
-
-
-
-
-
     }
 
     private static KafkaConsumer<String, String> createKafkaConsumer() {
