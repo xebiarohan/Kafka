@@ -283,5 +283,90 @@
     - Consumer group coordinator chacks the liveliness of the consumer in a group
     - using the polling mechanism (heartbeat check)
     - default value is heartbeat.interval.ms = 3000 ms
+    
+    
+    
+36. Till now we see the Kafka coding that is very low level. With time Kafka evolved and new APIs comes that encapsulates the
+    low level code.
+
+37. Kafka Connect
+    - It is a source connector to get data from a source and a sink connector to sink data in some data storage
+    - It is about the reusability
+    - It (Connect Cluster) sits between the source and Kafka cluster and data storage and Kafka cluster
+    - Connect cluster comprised of many workers
+    - Same Connect Cluster can be used for the soucse connector as well as sink connector
+    - There are already lots of connector available (80), so in case of connecting any data source or data storage first check if the connector is already present.
+
+38. Kafka Stream
+    - Easy data processing and transformation libreary, it is used for
+        - Data transformation
+        - Fraud detection    
+        - Data enrichment
+        - Monitoring and alerting
+
+39. Topic configuration
+    - Brokers have default for all the topic configuratiion parameters
+    - these parameters impacts the performace and topic behavior
+    - Some common topic configurations are:
+        - Replication factor
+        - Number of partitions
+        - Message size
+        - Compression level
+        - Log cleanup policy
+        - Min insync replicas
+        - etc
+
+40. Command to create a topic:
+    kafka-topics.sh --bootstrap-server localhost:9092 --topic configured-topic --create --partitions 3 --replication-factor 2
+
+41. Command to configure topics
+        - this part is common to all the config addition
+                kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name configured-topic --alter --add-config
+        - adding in sync replica config:
+                kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name configured-topic --alter --add-config min.insync.replicas=2   
+        - checking added config
+                kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name configured-topic --describe     
+        - delete a config  
+                kafka-configs.sh --bootstrap-server localhost:9092 --entity-type topics --entity-name configured-topic --alter --delete min.insync.replicas 
+
+42. Partitions are segments
+    - Topics are made of partitions and partitions are made of segments(files)
+    - Each segments have a range of offsets
+    - the last segment is known as the active segment, where the data is being written to
+    - Two main settings of partitions
+        - log.segment.types : the max size of a single segment (default is 1GB)
+        - log.segment.ms: the max time kafka wait before committing the segment if not full (1 week)
+
+43. Log cleanup policy
+    - Kafka cluster make data expire according to policy called as Log cleanup policy
+    - config
+        - log.cleanup.policy=delete (default for all user topics) : detete based on age of data( default is 1 week)
+        - log.cleanup.policy=compact (will describe later)
+
+44. log.cleanup.policy=delete
+        - log.retension.hourse (default is 168 hours - 1 week)
+        - log.retension.bytes  - Max bytes for each partition (default is -1 means unlimited)
+        - we can keep 2 different types of settings
+            - keeping data for 1 week and no limit on size
+            - Keeping data for infinite time but delete when the size reaches 500MB
+
+45. log.cleanup.policy=compact
+        - in ensures that your log contains atleast the last known value of a specific key in your patition
+        - very helpful in case we just need a snapshot insteadd of the full history
+        - for example 
+            - our topic is employee-salary
+            - where key of message  is  the employee name
+            - data comes as name-salary
+            - for each employee salary will keep on coming with different values
+            - After compaction the latest salary of each employee with be left in the segment (topic)
+        - deleted record can still be seen by consumer using config
+            - delete.retension.ms (default is 24 hours)
+
+46. Large messages in Apache Kafka
+    - has a default of 1MB per message in topics, as large messges are considered inefficient and an anti-pattern
+    - Two approach for sending large data   
+        - Using an external source like S3, Google cloud storage, HDFS and send a reference to that message in Kafka
+        - Modifying kafka parameters: must change broker, producer and consumer settings
+
 
     
