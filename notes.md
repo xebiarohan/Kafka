@@ -49,7 +49,7 @@
 8. Consumers
     - Consumers read data from a topic (identified by name) - pull model
     - A consumer can consume data from multiple partitions of a topic
-    - A consumer knows in advance from with broker, which kafka server to read from (from which partition)
+    - A consumer knows in advance from which broker, which kafka server to read from (from which partition)
     - Data from each partition is read in order (low to high offset 0,1,2...)
     - Deserializes the key and value from bytes into objects/data
 
