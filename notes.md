@@ -1,4 +1,5 @@
-1. It decouples the publishers and subscribers
+1. Kafka is a distributed event streaming platform for high throughput event processing and storage
+   It decouples the publishers and subscribers
 
 2. Distributed, resilient architecture and fault tolerant
 
