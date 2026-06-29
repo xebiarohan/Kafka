@@ -86,10 +86,11 @@
       you dont need to know about all the brokers in the cluster (explained in next point).
 
 12. Kafka broker discovery
-    - Each Kafka broker is also called as bootstrap server
-    - Kafka client sends a connection metadata request to one of the brokers
-    - Brokers responds with metadata that contains the list of all the brokers
-    - then Kafka client connects to the desired broker
+    - A Kafka client is configured with one or more **bootstrap servers** (addresses of Kafka brokers).
+    - The client sends a **Metadata Request** to one of the reachable bootstrap servers.
+    - The broker returns cluster metadata, including all brokers, topics, partitions, and partition leaders.
+    - Based on this metadata, the client connects directly to the broker that is the leader for the required partition.
+    - The client periodically refreshes metadata as the cluster topology changes.
 
 13. Topic replication factor
     - In local usually the replication factor is 1 means only leader partition
