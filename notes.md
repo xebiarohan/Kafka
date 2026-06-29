@@ -59,7 +59,7 @@
     - It contains multiple consumers
     - Each consumer in the group must read from different partitions from a topic
     - Each consumer group has a unique name
-    - If there are more consumers in a group then the partitions in a topic then the remaining consumers remains inactive (stand by consumer)
+    - If there are more consumers in a group then the partitions in a topic, then the extra consumers remains inactive (stand by consumer)
     - We can have mutiple consumer groups on a topic and consumers from different consumer groups can consume messages from a same partition
 
 10. Consumer offsets
