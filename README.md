@@ -88,3 +88,21 @@ stopping Kafka server:
 ./bin/kafka-serevr.sh     (it will stop all 3 servers)
 
 ```
+
+6. Kafka topic CLI
+
+Commands :
+```
+cd kafka/bin
+
+./kafka-topics.sh --create --topic topic1 --partitions 3 --replication-factor 1 --bootstrap-server localhost:9092
+
+./kafka-topics.sh --list --bootstrap-server localhost:9092
+
+./kafka-topics.sh --describe --bootstrap-server localhost:9092
+
+./kafka-topics.sh --delete --topic topic1 --bootstrap-server localhost:9092
+
+```
+
+Good practice is to provide multiple bootstrap-server if present
