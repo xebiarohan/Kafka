@@ -70,17 +70,17 @@ echo "Log IDs: '$LOG_ID_1' '$LOG_ID_2' '$LOG_ID_3'"
 ```
 ./bin/kafka-storage.sh format \
   -t "$CLUSTER_ID" \
-  -c config/server-1.properties \
+  -c config/mutliple-servers/server-1.properties \
   --initial-controllers "1@localhost:9093:$LOG_ID_1,2@localhost:9095:$LOG_ID_2,3@localhost:9097:$LOG_ID_3"
 
 ./bin/kafka-storage.sh format \
   -t "$CLUSTER_ID" \
-  -c config/server-2.properties \
+  -c config/mutliple-servers/server-2.properties \
   --initial-controllers "1@localhost:9093:$LOG_ID_1,2@localhost:9095:$LOG_ID_2,3@localhost:9097:$LOG_ID_3"
 
 ./bin/kafka-storage.sh format \
   -t "$CLUSTER_ID" \
-  -c config/server-3.properties \
+  -c config/mutliple-servers/server-3.properties \
   --initial-controllers "1@localhost:9093:$LOG_ID_1,2@localhost:9095:$LOG_ID_2,3@localhost:9097:$LOG_ID_3"
 
 ```
@@ -89,9 +89,9 @@ echo "Log IDs: '$LOG_ID_1' '$LOG_ID_2' '$LOG_ID_3'"
 5.3 Start all the 3 servers:
 
 ```
-./bin/kafka-server-start.sh config/server-1.properties
-./bin/kafka-server-start.sh config/server-2.properties
-./bin/kafka-server-start.sh config/server-3.properties
+./bin/kafka-server-start.sh config/mutliple-servers/server-1.properties
+./bin/kafka-server-start.sh config/mutliple-servers/server-2.properties
+./bin/kafka-server-start.sh config/mutliple-servers/server-3.properties
 
 ```
 
@@ -142,3 +142,17 @@ Running producer where we can send data with key
 
 If a topic is not present, then when we send the first message it will give an error but it will also create that topic. So from second message it will work fine.
 This is the default behavior that we can change.
+
+
+8. Kafka consumer
+
+- We can read the messages from beginning or new messages only
+
+```
+./bin/kafka-console-consumer.sh --topic topic1 --from-beginning --bootstrap-server localhost:9092
+
+./bin/kafka-console-consumer.sh --topic topic1 --bootstrap-server localhost:9092
+
+./bin/kafka-console-consumer.sh --topic topic1 --bootstrap-server localhost:9092 --property "print.key=true"
+
+```
